@@ -1,0 +1,291 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>facerecognition_yale_eigen</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-10-16"><meta name="DC.source" content="facerecognition_yale_eigen.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [] = facerecognition_yale_eigen()
+listing = dir(<span class="string">'../../CroppedYale'</span>);
+x={listing.name};
+<span class="comment">%ORLdatabase = dir("../../att_faces");</span>
+count = 1;
+identity = zeros(1520,1);
+<span class="keyword">for</span> i = 1:1:39
+    <span class="keyword">if</span>(i&lt;14)
+        filename = strcat([<span class="string">'../../CroppedYale/'</span> x{i+2} ]);
+        <span class="keyword">for</span> j=1:1:40
+            listing2 = dir(filename);
+            y={listing2.name};
+            filename2 = strcat([filename <span class="string">'/'</span> y{j+2} ]);
+            <span class="comment">%movefile filename  ../../training_set</span>
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            training_set(:,count) = img(:);   <span class="comment">%192*168 x 1 x 192</span>
+            identity(count) = i;
+            count = count + 1;
+        <span class="keyword">end</span>
+    <span class="keyword">elseif</span>(i&gt;14)
+        filename = strcat([<span class="string">'../../CroppedYale/'</span> x{i+1} ]);
+        <span class="keyword">for</span> j=1:1:40
+            listing2 = dir(filename);
+            y={listing2.name};
+            filename2 = strcat([filename <span class="string">'/'</span> y{j+2} ]);
+            <span class="comment">%movefile filename  ../../training_set</span>
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            training_set(:,count) = img(:);   <span class="comment">%192*168 x 1 x 192</span>
+            identity(count) = i;
+            count = count + 1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%training_set(:,1));</span>
+mean = transpose(sum(transpose(training_set)))./(1520); <span class="comment">% coz sum returns that of row...</span>
+<span class="comment">%disp(size(mean));</span>
+<span class="comment">%disp(size(training_set));</span>
+<span class="keyword">for</span> i = 1:1:1520
+ mean_centered_training_set(:,i) = double(training_set(:,i)) - mean;
+<span class="keyword">end</span>
+<span class="comment">%covariance = cov(mean_centered_training_set)./1519;</span>
+k_vector = [1, 2, 3, 5, 10, 15, 20, 30, 50, 75, 100, 150, 170];
+recognition_vector = zeros(size(k_vector));
+<span class="keyword">for</span> k = 1:1:size(k_vector,2)
+[V, D] = eig(mean_centered_training_set'*mean_centered_training_set);
+U = mean_centered_training_set*V;
+<span class="keyword">for</span> i=1:1:1520
+    U(:,i) = U(:,i)/norm(U(:,i));
+<span class="keyword">end</span>
+U = U(:,end-1:-1:1520-k_vector(k)); <span class="comment">% Top k eigen_vectors are extracted and stored in U</span>
+<span class="comment">% Now U contains K eigen-vectors</span>
+eigen_coeff_training = U'*mean_centered_training_set;  <span class="comment">% size k x 1520</span>
+<span class="comment">%disp(eigen_coeff_training);</span>
+<span class="comment">%disp(size(eigen_coeff_training));</span>
+<span class="comment">%--TESTING PHASE</span>
+recognition_rate = 0;
+<span class="comment">%disp(size(y));</span>
+<span class="keyword">for</span> i = 1:1:39
+    <span class="keyword">if</span>(i &lt; 14)
+        filename = strcat([<span class="string">'../../CroppedYale/'</span> x{i+2} ]);
+        listing2 = dir(filename);
+        y={listing2.name};
+        <span class="keyword">for</span> j=41:1:size(y,2)-2
+            <span class="comment">%disp(j);</span>
+            filename2 = strcat([filename <span class="string">'/'</span> y{j+2} ]);
+            <span class="comment">%movefile filename  ../../training_set</span>
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            eigen_coeff_testing = U'*(double(img(:)) - mean);  <span class="comment">%10*1</span>
+        <span class="comment">%disp(size(eigen_coeff_testing));</span>
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        recognition_rate = recognition_rate + (i==identity(minimum_id));
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">if</span>(i &gt; 14)
+        filename = strcat([<span class="string">'../../CroppedYale/'</span> x{i+1} ]);
+        listing2 = dir(filename);
+        y={listing2.name};
+        <span class="keyword">for</span> j=41:1:size(y,2)-2
+            filename2 = strcat([filename <span class="string">'/'</span> y{j+2} ]);
+            <span class="comment">%movefile filename  ../../training_set</span>
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            eigen_coeff_testing = U'*(double(img(:)) - mean);  <span class="comment">%10*1</span>
+        <span class="comment">%disp(size(eigen_coeff_testing));</span>
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        recognition_rate = recognition_rate + (i==identity(minimum_id));
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+recognition_vector(k) = 100*recognition_rate/912;
+fprintf (<span class="string">'K_vector= %d,Recogniton rate = %f\n'</span>,k_vector(k),recognition_vector(k));
+<span class="keyword">end</span>
+<span class="comment">%disp(recognition_vector);</span>
+plot(k_vector, recognition_vector);
+xlabel(<span class="string">'K vector'</span>);
+ylabel(<span class="string">'Recognition rate'</span>);
+ title(<span class="string">'Eigen Decomposition on Yale database'</span>);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">K_vector= 1,Recogniton rate = 2.412281
+K_vector= 2,Recogniton rate = 3.289474
+K_vector= 3,Recogniton rate = 4.276316
+K_vector= 5,Recogniton rate = 9.210526
+K_vector= 10,Recogniton rate = 17.872807
+K_vector= 15,Recogniton rate = 23.026316
+K_vector= 20,Recogniton rate = 26.425439
+K_vector= 30,Recogniton rate = 30.811404
+K_vector= 50,Recogniton rate = 35.416667
+K_vector= 75,Recogniton rate = 37.609649
+K_vector= 100,Recogniton rate = 38.815789
+K_vector= 150,Recogniton rate = 39.254386
+K_vector= 170,Recogniton rate = 39.692982
+</pre><img vspace="5" hspace="5" src="facerecognition_yale_eigen_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [] = facerecognition_yale_eigen()
+listing = dir('../../CroppedYale');
+x={listing.name};
+%ORLdatabase = dir("../../att_faces");
+count = 1;
+identity = zeros(1520,1);
+for i = 1:1:39
+    if(i<14)
+        filename = strcat(['../../CroppedYale/' x{i+2} ]);
+        for j=1:1:40
+            listing2 = dir(filename);
+            y={listing2.name};
+            filename2 = strcat([filename '/' y{j+2} ]);
+            %movefile filename  ../../training_set
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            training_set(:,count) = img(:);   %192*168 x 1 x 192
+            identity(count) = i;
+            count = count + 1;
+        end
+    elseif(i>14)
+        filename = strcat(['../../CroppedYale/' x{i+1} ]);
+        for j=1:1:40
+            listing2 = dir(filename);
+            y={listing2.name};
+            filename2 = strcat([filename '/' y{j+2} ]);
+            %movefile filename  ../../training_set
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            training_set(:,count) = img(:);   %192*168 x 1 x 192
+            identity(count) = i;
+            count = count + 1;
+        end
+    end
+end
+%training_set(:,1));
+mean = transpose(sum(transpose(training_set)))./(1520); % coz sum returns that of row...
+%disp(size(mean));
+%disp(size(training_set));
+for i = 1:1:1520
+ mean_centered_training_set(:,i) = double(training_set(:,i)) - mean;
+end
+%covariance = cov(mean_centered_training_set)./1519;
+k_vector = [1, 2, 3, 5, 10, 15, 20, 30, 50, 75, 100, 150, 170];
+recognition_vector = zeros(size(k_vector));
+for k = 1:1:size(k_vector,2)
+[V, D] = eig(mean_centered_training_set'*mean_centered_training_set);
+U = mean_centered_training_set*V;
+for i=1:1:1520
+    U(:,i) = U(:,i)/norm(U(:,i)); 
+end
+U = U(:,end-1:-1:1520-k_vector(k)); % Top k eigen_vectors are extracted and stored in U
+% Now U contains K eigen-vectors
+eigen_coeff_training = U'*mean_centered_training_set;  % size k x 1520
+%disp(eigen_coeff_training);
+%disp(size(eigen_coeff_training));
+%REPLACE_WITH_DASH_DASHTESTING PHASE
+recognition_rate = 0;
+%disp(size(y));
+for i = 1:1:39
+    if(i < 14) 
+        filename = strcat(['../../CroppedYale/' x{i+2} ]);
+        listing2 = dir(filename);
+        y={listing2.name};
+        for j=41:1:size(y,2)-2
+            %disp(j);
+            filename2 = strcat([filename '/' y{j+2} ]);
+            %movefile filename  ../../training_set
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            eigen_coeff_testing = U'*(double(img(:)) - mean);  %10*1
+        %disp(size(eigen_coeff_testing));
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        recognition_rate = recognition_rate + (i==identity(minimum_id));
+        end
+    end
+    if(i > 14) 
+        filename = strcat(['../../CroppedYale/' x{i+1} ]);
+        listing2 = dir(filename);
+        y={listing2.name};
+        for j=41:1:size(y,2)-2
+            filename2 = strcat([filename '/' y{j+2} ]);
+            %movefile filename  ../../training_set
+            img = imread(filename2);
+            img = reshape(img,[],1);
+            eigen_coeff_testing = U'*(double(img(:)) - mean);  %10*1
+        %disp(size(eigen_coeff_testing));
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        recognition_rate = recognition_rate + (i==identity(minimum_id));
+        end    
+    end           
+end
+recognition_vector(k) = 100*recognition_rate/912;
+fprintf ('K_vector= %d,Recogniton rate = %f\n',k_vector(k),recognition_vector(k));
+end
+%disp(recognition_vector);
+plot(k_vector, recognition_vector);
+xlabel('K vector');
+ylabel('Recognition rate');
+ title('Eigen Decomposition on Yale database');
+end
+##### SOURCE END #####
+--></body></html>
