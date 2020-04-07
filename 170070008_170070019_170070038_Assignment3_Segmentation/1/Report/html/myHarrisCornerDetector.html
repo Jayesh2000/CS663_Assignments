@@ -1,0 +1,329 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>myHarrisCornerDetector</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-09-08"><meta name="DC.source" content="myHarrisCornerDetector.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> myHarrisCornerDetector()
+IMG1=load(<span class="string">'..\data\boat.mat'</span>);
+OrigImage = IMG1.imageOrig;
+bar = waitbar(0,<span class="string">'Harris Corner Detector ..'</span>);
+path = <span class="string">'../Images/'</span>;
+filename = strcat([path <span class="string">'OrigImage.png'</span>]);
+imwrite(mat2gray(OrigImage), filename);
+
+import <span class="string">mlreportgen.report.*</span>
+R = Report(<span class="string">'HarrisCornerDetector'</span>, <span class="string">'pdf'</span>);
+open(R);
+add(R, <span class="string">"        APPROACH      "</span>);
+add(R, <span class="string">"The input image is firstly smoothened using a Gaussian Filter (SD = 1). Its directional derivative along the two axes is then taken using Sobel Operator where the mask is convoluted with the image matrix. The Gaussian weights (SD = 2) are then added and elements of second derivative matrix are computed. Now for each patch, the structure tensor matrix is computed by adding the corresponding elements of derivatives computed before. The two eigen values for each tensor matrix are found and eigen matrices with respective eigen values at the pixel coordinates where the patch was made is constructed. The response matrix is constructed by taking the difference between the determinant and scaled trace's square of the tensor (k = 0.05). With Non-maximum suppression being performed on the resultant response matrix, results in the required Corner-Measure output. "</span>);
+close(R);
+
+<span class="comment">%img1 = image(uint8(which(filename)));</span>
+
+<span class="comment">%add(R, "Input Image");</span>
+<span class="comment">%fig = image(OrigImage);</span>
+<span class="comment">%add(R, fig);</span>
+
+
+InputImage = OrigImage;
+<span class="comment">%subplot(1,2,2)</span>
+<span class="comment">%imshow(mat2gray(InputImage))</span>
+<span class="comment">%disp(OrigImage);</span>
+<span class="comment">%[image_x, image_y] = size(InputImage);</span>
+
+<span class="comment">%patch size</span>
+n=3;
+
+<span class="comment">%Linear Stretching of Intensities between 0 and 1</span>
+max_intensity = max(max(InputImage));
+min_intensity = min(min(InputImage));
+InputImage = InputImage - min_intensity;
+InputImage = InputImage./(max_intensity - min_intensity);
+
+<span class="comment">%1st smoothing level</span>
+sigma_1 = 1;
+fprintf(<span class="string">'SD for gaussian smoothing of Input Image: %d\n'</span>, sigma_1);
+g_1 = fspecial(<span class="string">'gaussian'</span>,[n n], sigma_1);
+InputImage = imfilter(InputImage, g_1, <span class="string">'same'</span>);
+<span class="comment">%disp(InputImage);</span>
+
+<span class="comment">%Using Sobel Operator to find and display derivative Images</span>
+u = [1 0 -1]';
+v = [1 2 1];
+Grad_y = conv2(u,v,InputImage);
+Grad_x = conv2(v,u,InputImage);
+filename = strcat([path <span class="string">'X_derivative_Image.png'</span>]);
+imwrite(mat2gray(Grad_x), filename);
+figure, imshow(mat2gray(Grad_x));
+title(<span class="string">'X derivative Image'</span>);
+filename = strcat([path <span class="string">'Y_derivative_Image.png'</span>]);
+imwrite(mat2gray(Grad_y), filename);
+figure, imshow(mat2gray(Grad_y));
+title(<span class="string">'Y derivative Image'</span>);
+
+<span class="comment">%2nd smoothing level</span>
+sigma_2 = 2;
+fprintf(<span class="string">'SD for gaussian weightning of Image derivates: %d\n'</span>, sigma_2);
+g_2 = fspecial(<span class="string">'gaussian'</span>,[n n], sigma_2);
+Ix_2 = imfilter(Grad_x.^2, g_2, <span class="string">'same'</span>);
+<span class="comment">%figure, imshow(mat2gray(Ix_2))</span>
+Iy_2 = imfilter(Grad_y.^2, g_2, <span class="string">'same'</span>);
+<span class="comment">%imshow(mat2gray(Iy_2))</span>
+IxIy = imfilter(Grad_x.*Grad_y, g_2, <span class="string">'same'</span>);
+
+Eigen_1 = zeros(size(Ix_2));
+Eigen_2 = Eigen_1;
+R = Eigen_1;
+corner_measure = R;
+
+<span class="comment">%Constant for corner-ness measure</span>
+k=0.05;
+fprintf(<span class="string">'Constant for corner-ness measure: %d\n'</span>, k);
+
+<span class="comment">%Loop to compute the required responses</span>
+<span class="keyword">for</span> ii = 1:1:size(Ix_2,1)
+    <span class="keyword">for</span> jj = 1:1:size(Ix_2,2)
+        sum_Ix_2 = sum(sum(Ix_2(ii - min(ii-1,((n-1)/2)): ii + min(size(Ix_2,1)-ii, ((n-1)/2)), jj - min(jj-1,((n-1)/2)): jj + min(size(Ix_2,2)-jj, ((n-1)/2)))));
+        sum_Iy_2 = sum(sum(Iy_2(ii - min(ii-1,((n-1)/2)): ii + min(size(Ix_2,1)-ii, ((n-1)/2)), jj - min(jj-1,((n-1)/2)): jj + min(size(Ix_2,2)-jj, ((n-1)/2)))));
+        sum_IxIy = sum(sum(IxIy(ii - min(ii-1,((n-1)/2)): ii + min(size(Ix_2,1)-ii, ((n-1)/2)), jj - min(jj-1,((n-1)/2)): jj + min(size(Ix_2,2)-jj, ((n-1)/2)))));
+
+        <span class="comment">%Structure Tensor Setup</span>
+        A = [sum_Ix_2, sum_IxIy; sum_IxIy, sum_Iy_2];
+
+        <span class="comment">%Eigen Matrix Computation</span>
+        eigen = eig(A);
+        Eigen_1(ii,jj) = min(eigen);
+        Eigen_2(ii,jj) = max(eigen);
+
+        <span class="comment">%Harris Response calculation</span>
+        R(ii,jj) = Eigen_1(ii,jj)*Eigen_2(ii,jj) - k*(Eigen_1(ii,jj) + Eigen_2(ii,jj))^2;
+
+        <span class="comment">%Non-maximum Suppression</span>
+        <span class="keyword">if</span> (R(ii,jj) &gt; 2)
+            corner_measure(ii,jj) = 255;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%disp(max(max(R)));</span>
+filename = strcat([path <span class="string">'Eigen_Image_1.png'</span>]);
+imwrite(mat2gray(Eigen_1), filename);
+figure, imshow(mat2gray(Eigen_1)), colorbar;
+title(<span class="string">'Eigen Image 1'</span>);
+filename = strcat([path <span class="string">'Eigen_Image_2.png'</span>]);
+imwrite(mat2gray(Eigen_2), filename);
+figure, imshow(mat2gray(Eigen_2)), colorbar;
+title(<span class="string">'Eigen Image 2'</span>);
+filename = strcat([path <span class="string">'Corner_Measure_Image.png'</span>]);
+imwrite(mat2gray(corner_measure), filename);
+figure, imshow(mat2gray(corner_measure)), colorbar;
+title(<span class="string">'Corner Measure Image'</span>);
+figure, imshow(mat2gray(OrigImage));
+title(<span class="string">'Original Image'</span>);
+waitbar(ii/size(Ix_2,1), bar);
+
+<span class="comment">%{
+</span><span class="comment">filename = strcat([path 'Corner Measure Image.png']);
+</span><span class="comment">imwrite(mat2gray(corner_measure), filename);
+</span><span class="comment">img2 = image(uint8(which(filename)));
+</span><span class="comment">table = BaseTable({'Original' 'Corner Measure';img1,img2});
+</span><span class="comment">add(R, table);
+</span><span class="comment">%}
+</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">SD for gaussian smoothing of Input Image: 1
+SD for gaussian weightning of Image derivates: 2
+Constant for corner-ness measure: 5.000000e-02
+</pre><img vspace="5" hspace="5" src="myHarrisCornerDetector_01.png" alt=""> <img vspace="5" hspace="5" src="myHarrisCornerDetector_02.png" alt=""> <img vspace="5" hspace="5" src="myHarrisCornerDetector_03.png" alt=""> <img vspace="5" hspace="5" src="myHarrisCornerDetector_04.png" alt=""> <img vspace="5" hspace="5" src="myHarrisCornerDetector_05.png" alt=""> <img vspace="5" hspace="5" src="myHarrisCornerDetector_06.png" alt=""> <img vspace="5" hspace="5" src="myHarrisCornerDetector_07.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function myHarrisCornerDetector()
+IMG1=load('..\data\boat.mat');
+OrigImage = IMG1.imageOrig;
+bar = waitbar(0,'Harris Corner Detector ..');
+path = '../Images/';
+filename = strcat([path 'OrigImage.png']);
+imwrite(mat2gray(OrigImage), filename);
+
+import mlreportgen.report.*
+R = Report('HarrisCornerDetector', 'pdf');
+open(R);
+add(R, "        APPROACH      ");
+add(R, "The input image is firstly smoothened using a Gaussian Filter (SD = 1). Its directional derivative along the two axes is then taken using Sobel Operator where the mask is convoluted with the image matrix. The Gaussian weights (SD = 2) are then added and elements of second derivative matrix are computed. Now for each patch, the structure tensor matrix is computed by adding the corresponding elements of derivatives computed before. The two eigen values for each tensor matrix are found and eigen matrices with respective eigen values at the pixel coordinates where the patch was made is constructed. The response matrix is constructed by taking the difference between the determinant and scaled trace's square of the tensor (k = 0.05). With Non-maximum suppression being performed on the resultant response matrix, results in the required Corner-Measure output. ");
+close(R);
+
+%img1 = image(uint8(which(filename)));
+
+%add(R, "Input Image");
+%fig = image(OrigImage);
+%add(R, fig);
+
+
+InputImage = OrigImage;
+%subplot(1,2,2)
+%imshow(mat2gray(InputImage))
+%disp(OrigImage);
+%[image_x, image_y] = size(InputImage);
+
+%patch size
+n=3;
+
+%Linear Stretching of Intensities between 0 and 1
+max_intensity = max(max(InputImage));
+min_intensity = min(min(InputImage));
+InputImage = InputImage - min_intensity;
+InputImage = InputImage./(max_intensity - min_intensity);
+
+%1st smoothing level
+sigma_1 = 1;
+fprintf('SD for gaussian smoothing of Input Image: %d\n', sigma_1);
+g_1 = fspecial('gaussian',[n n], sigma_1);
+InputImage = imfilter(InputImage, g_1, 'same');
+%disp(InputImage);
+
+%Using Sobel Operator to find and display derivative Images
+u = [1 0 -1]';
+v = [1 2 1];
+Grad_y = conv2(u,v,InputImage);
+Grad_x = conv2(v,u,InputImage);
+filename = strcat([path 'X_derivative_Image.png']);
+imwrite(mat2gray(Grad_x), filename);
+figure, imshow(mat2gray(Grad_x));
+title('X derivative Image');
+filename = strcat([path 'Y_derivative_Image.png']);
+imwrite(mat2gray(Grad_y), filename);
+figure, imshow(mat2gray(Grad_y));
+title('Y derivative Image');
+
+%2nd smoothing level
+sigma_2 = 2;
+fprintf('SD for gaussian weightning of Image derivates: %d\n', sigma_2);
+g_2 = fspecial('gaussian',[n n], sigma_2);
+Ix_2 = imfilter(Grad_x.^2, g_2, 'same');
+%figure, imshow(mat2gray(Ix_2))
+Iy_2 = imfilter(Grad_y.^2, g_2, 'same');
+%imshow(mat2gray(Iy_2))
+IxIy = imfilter(Grad_x.*Grad_y, g_2, 'same');
+
+Eigen_1 = zeros(size(Ix_2));
+Eigen_2 = Eigen_1;
+R = Eigen_1;
+corner_measure = R;
+
+%Constant for corner-ness measure
+k=0.05;
+fprintf('Constant for corner-ness measure: %d\n', k);
+
+%Loop to compute the required responses
+for ii = 1:1:size(Ix_2,1)
+    for jj = 1:1:size(Ix_2,2)
+        sum_Ix_2 = sum(sum(Ix_2(ii - min(ii-1,((n-1)/2)): ii + min(size(Ix_2,1)-ii, ((n-1)/2)), jj - min(jj-1,((n-1)/2)): jj + min(size(Ix_2,2)-jj, ((n-1)/2)))));
+        sum_Iy_2 = sum(sum(Iy_2(ii - min(ii-1,((n-1)/2)): ii + min(size(Ix_2,1)-ii, ((n-1)/2)), jj - min(jj-1,((n-1)/2)): jj + min(size(Ix_2,2)-jj, ((n-1)/2)))));
+        sum_IxIy = sum(sum(IxIy(ii - min(ii-1,((n-1)/2)): ii + min(size(Ix_2,1)-ii, ((n-1)/2)), jj - min(jj-1,((n-1)/2)): jj + min(size(Ix_2,2)-jj, ((n-1)/2)))));
+        
+        %Structure Tensor Setup
+        A = [sum_Ix_2, sum_IxIy; sum_IxIy, sum_Iy_2];
+        
+        %Eigen Matrix Computation
+        eigen = eig(A);
+        Eigen_1(ii,jj) = min(eigen);
+        Eigen_2(ii,jj) = max(eigen);
+        
+        %Harris Response calculation
+        R(ii,jj) = Eigen_1(ii,jj)*Eigen_2(ii,jj) - k*(Eigen_1(ii,jj) + Eigen_2(ii,jj))^2;
+        
+        %Non-maximum Suppression
+        if (R(ii,jj) > 2)
+            corner_measure(ii,jj) = 255;
+        end
+    end
+end
+%disp(max(max(R)));
+filename = strcat([path 'Eigen_Image_1.png']);
+imwrite(mat2gray(Eigen_1), filename);
+figure, imshow(mat2gray(Eigen_1)), colorbar;
+title('Eigen Image 1');
+filename = strcat([path 'Eigen_Image_2.png']);
+imwrite(mat2gray(Eigen_2), filename);
+figure, imshow(mat2gray(Eigen_2)), colorbar;
+title('Eigen Image 2');
+filename = strcat([path 'Corner_Measure_Image.png']);
+imwrite(mat2gray(corner_measure), filename);
+figure, imshow(mat2gray(corner_measure)), colorbar;
+title('Corner Measure Image');
+figure, imshow(mat2gray(OrigImage));
+title('Original Image');
+waitbar(ii/size(Ix_2,1), bar);
+
+%{
+filename = strcat([path 'Corner Measure Image.png']);
+imwrite(mat2gray(corner_measure), filename);
+img2 = image(uint8(which(filename)));
+table = BaseTable({'Original' 'Corner Measure';img1,img2});
+add(R, table);
+%}
+
+end
+##### SOURCE END #####
+--></body></html>
