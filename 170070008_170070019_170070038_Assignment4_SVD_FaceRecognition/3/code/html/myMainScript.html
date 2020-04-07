@@ -1,0 +1,269 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>myMainScript</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-10-16"><meta name="DC.source" content="myMainScript.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">MyMainScript</a></li><li><a href="#2">Your code here</a></li></ul></div><h2 id="1">MyMainScript</h2><pre class="codeinput">tic;
+</pre><h2 id="2">Your code here</h2><pre class="codeinput"><span class="comment">%ALGORITHM: A Threshold is first calculated based on the correlation</span>
+<span class="comment">%between the images as the training set. For the other four of the same</span>
+<span class="comment">%trained images, incase the sqaure error shall remain with the bounds of</span>
+<span class="comment">%the given threshold and hence, serves as a criteria for matching Identity.</span>
+<span class="comment">%For the untrained set, the difference is usually greater than the</span>
+<span class="comment">%threshold and can be used to report no identity match then!</span>
+count = 1;
+identity = zeros(192,1);
+<span class="keyword">for</span> i = 1:1:32
+    <span class="keyword">for</span> j=1:1:6
+      filename = strcat([<span class="string">'../../att_faces/s'</span> num2str(i) <span class="string">'/'</span> num2str(j) <span class="string">'.pgm'</span>]);
+      <span class="comment">%movefile filename  ../../training_set</span>
+      img = imread(filename);
+      training_set(:,count) = img(:);   <span class="comment">%92*112 x 1 x 192</span>
+      identity(count) = i;
+      count = count + 1;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%training_set(:,1));</span>
+mean = transpose(sum(transpose(training_set)))./(192); <span class="comment">% coz sum returns that of row...</span>
+<span class="comment">%disp(size(mean));</span>
+<span class="comment">%disp(size(training_set));</span>
+<span class="keyword">for</span> i = 1:1:192
+ mean_centered_training_set(:,i) = double(training_set(:,i)) - mean;
+<span class="keyword">end</span>
+<span class="comment">%covariance = cov(mean_centered_training_set)./191;</span>
+k_vector = [1, 2, 3, 5, 10, 15, 20, 30, 50, 75, 100, 150, 170];
+recognition_vector = zeros(size(k_vector));
+<span class="keyword">for</span> k = 1:1:size(k_vector,2)
+[U, S, V] = svds(mean_centered_training_set, k_vector(k));
+<span class="comment">% Now U contains K eigen-vectors</span>
+<span class="comment">%disp(size(U));</span>
+eigen_coeff_training = U'*mean_centered_training_set;  <span class="comment">% size k x 192</span>
+<span class="comment">%disp(eigen_coeff_training);</span>
+<span class="comment">%disp(size(eigen_coeff_training));</span>
+<span class="comment">%--TESTING PHASE</span>
+<span class="keyword">for</span> i=1:32
+    eigcoeffs_training_perperson = eigen_coeff_training(:,identity == i);
+    dist = zeros(6,6);
+    <span class="keyword">for</span> k1=1:6
+        <span class="keyword">for</span> k2=1:6
+            distance(k1,k2) = sum(eigcoeffs_training_perperson(1:k,k1)-eigcoeffs_training_perperson(1:k,k2)).^2;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    thres(i) = max(distance(:));
+<span class="keyword">end</span>
+<span class="comment">%Value of threshold chosen based on the training set images</span>
+threshold = median(thres)*3e-4;
+false_positive = 0;
+<span class="comment">%False positives computed over untrained set</span>
+<span class="keyword">for</span> i = 33:1:40
+    <span class="keyword">for</span> j = 1:1:10
+        filename = strcat([<span class="string">'../../att_faces/s'</span> num2str(i) <span class="string">'/'</span> num2str(j) <span class="string">'.pgm'</span>]);
+        img = imread(filename);
+        eigen_coeff_testing = U'*(double(img(:)) - mean);  <span class="comment">%10*1</span>
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        <span class="keyword">if</span> (minimum_diff &lt; threshold)
+            false_positive = false_positive+1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+ fprintf (<span class="string">'K_vector= %d,False positives = %f\n'</span>,k_vector(k),false_positive);
+false_negative = 0;
+<span class="comment">%False negative computed over trained set</span>
+<span class="keyword">for</span> i = 1:1:32
+    <span class="keyword">for</span> j = 7:1:10
+        filename = strcat([<span class="string">'../../att_faces/s'</span> num2str(i) <span class="string">'/'</span> num2str(j) <span class="string">'.pgm'</span>]);
+        img = imread(filename);
+        eigen_coeff_testing = U'*(double(img(:)) - mean);  <span class="comment">%10*1</span>
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        <span class="keyword">if</span> (minimum_diff &gt; threshold)
+            false_negative = false_negative+1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+ <span class="comment">%false_negative = false_negative/128;</span>
+ fprintf (<span class="string">'K_vector= %d,False negatives = %f\n'</span>,k_vector(k),false_negative);
+<span class="keyword">end</span>
+
+toc;
+</pre><pre class="codeoutput">K_vector= 1,False positives = 80.000000
+K_vector= 1,False negatives = 0.000000
+K_vector= 2,False positives = 65.000000
+K_vector= 2,False negatives = 5.000000
+K_vector= 3,False positives = 60.000000
+K_vector= 3,False negatives = 9.000000
+K_vector= 5,False positives = 49.000000
+K_vector= 5,False negatives = 17.000000
+K_vector= 10,False positives = 19.000000
+K_vector= 10,False negatives = 24.000000
+K_vector= 15,False positives = 15.000000
+K_vector= 15,False negatives = 22.000000
+K_vector= 20,False positives = 5.000000
+K_vector= 20,False negatives = 24.000000
+K_vector= 30,False positives = 65.000000
+K_vector= 30,False negatives = 9.000000
+K_vector= 50,False positives = 80.000000
+K_vector= 50,False negatives = 0.000000
+K_vector= 75,False positives = 79.000000
+K_vector= 75,False negatives = 0.000000
+K_vector= 100,False positives = 80.000000
+K_vector= 100,False negatives = 0.000000
+K_vector= 150,False positives = 80.000000
+K_vector= 150,False negatives = 0.000000
+K_vector= 170,False positives = 78.000000
+K_vector= 170,False negatives = 0.000000
+Elapsed time is 13.511394 seconds.
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% MyMainScript
+
+tic;
+%% Your code here
+%ALGORITHM: A Threshold is first calculated based on the correlation
+%between the images as the training set. For the other four of the same
+%trained images, incase the sqaure error shall remain with the bounds of
+%the given threshold and hence, serves as a criteria for matching Identity.
+%For the untrained set, the difference is usually greater than the 
+%threshold and can be used to report no identity match then!
+count = 1;
+identity = zeros(192,1);
+for i = 1:1:32
+    for j=1:1:6
+      filename = strcat(['../../att_faces/s' num2str(i) '/' num2str(j) '.pgm']);
+      %movefile filename  ../../training_set
+      img = imread(filename);
+      training_set(:,count) = img(:);   %92*112 x 1 x 192
+      identity(count) = i;
+      count = count + 1;
+    end
+end
+%training_set(:,1));
+mean = transpose(sum(transpose(training_set)))./(192); % coz sum returns that of row...
+%disp(size(mean));
+%disp(size(training_set));
+for i = 1:1:192
+ mean_centered_training_set(:,i) = double(training_set(:,i)) - mean;
+end
+%covariance = cov(mean_centered_training_set)./191;
+k_vector = [1, 2, 3, 5, 10, 15, 20, 30, 50, 75, 100, 150, 170];
+recognition_vector = zeros(size(k_vector));
+for k = 1:1:size(k_vector,2)
+[U, S, V] = svds(mean_centered_training_set, k_vector(k)); 
+% Now U contains K eigen-vectors
+%disp(size(U));
+eigen_coeff_training = U'*mean_centered_training_set;  % size k x 192
+%disp(eigen_coeff_training);
+%disp(size(eigen_coeff_training));
+%REPLACE_WITH_DASH_DASHTESTING PHASE
+for i=1:32
+    eigcoeffs_training_perperson = eigen_coeff_training(:,identity == i);    
+    dist = zeros(6,6);
+    for k1=1:6
+        for k2=1:6
+            distance(k1,k2) = sum(eigcoeffs_training_perperson(1:k,k1)-eigcoeffs_training_perperson(1:k,k2)).^2;
+        end
+    end
+    thres(i) = max(distance(:));    
+end
+%Value of threshold chosen based on the training set images
+threshold = median(thres)*3e-4;
+false_positive = 0;
+%False positives computed over untrained set
+for i = 33:1:40
+    for j = 1:1:10
+        filename = strcat(['../../att_faces/s' num2str(i) '/' num2str(j) '.pgm']);
+        img = imread(filename);
+        eigen_coeff_testing = U'*(double(img(:)) - mean);  %10*1
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        if (minimum_diff < threshold)
+            false_positive = false_positive+1;
+        end
+    end
+end
+ fprintf ('K_vector= %d,False positives = %f\n',k_vector(k),false_positive);
+false_negative = 0;
+%False negative computed over trained set
+for i = 1:1:32
+    for j = 7:1:10
+        filename = strcat(['../../att_faces/s' num2str(i) '/' num2str(j) '.pgm']);
+        img = imread(filename);
+        eigen_coeff_testing = U'*(double(img(:)) - mean);  %10*1
+        diffs = pdist2(eigen_coeff_testing', eigen_coeff_training');
+        [minimum_diff, minimum_id] = min(diffs);
+        if (minimum_diff > threshold)
+            false_negative = false_negative+1;
+        end
+    end
+end
+ %false_negative = false_negative/128;
+ fprintf ('K_vector= %d,False negatives = %f\n',k_vector(k),false_negative);
+end
+
+toc;
+
+##### SOURCE END #####
+--></body></html>
