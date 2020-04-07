@@ -1,0 +1,7 @@
+%% MyMainScript
+
+tic;
+%% Your code here
+M = imread(
+last(
+toc;
